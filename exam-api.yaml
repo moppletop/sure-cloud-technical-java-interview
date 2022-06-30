@@ -1,0 +1,163 @@
+openapi: '3.0.2'
+
+info:
+  title: Java Technical Interview
+  version: 1.0.0
+  description: Java Technical Interview
+  contact:
+    name: Sam Lloyd
+    url: https://github.com/moppletop
+
+servers:
+  - url: "http://localhost:8080/"
+
+tags:
+  - name: exam-command
+    description: Operations for adding exam results
+  - name: exam-query
+    description: Operations for querying exam results
+
+paths:
+
+  /v1/exam/command/add:
+    post:
+      summary: Adds a new exam result
+      operationId: addResult
+      tags:
+        - exam-command
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddExamResultDto'
+      responses:
+        200:
+          description: Exam result has been successfully added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamResult'
+        400:
+          $ref: '#/components/responses/400'
+        500:
+          $ref: '#/components/responses/500'
+
+  /v1/exam/query:
+    get:
+      summary: Gets all exam results
+      operationId: getResults
+      tags:
+        - exam-query
+      responses:
+        200:
+          description: Retrieved exam results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExamResult'
+        400:
+          $ref: '#/components/responses/400'
+        500:
+          $ref: '#/components/responses/500'
+
+  /v1/exam/query/{id}:
+    get:
+      summary: Get an exam result by it's id
+      operationId: getResult
+      tags:
+        - exam-query
+      parameters:
+        - name: id
+          in: path
+          required: true
+          allowEmptyValue: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Retrieved exam result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExamResult'
+        400:
+          $ref: '#/components/responses/400'
+        500:
+          $ref: '#/components/responses/500'
+
+components:
+  schemas:
+
+    # Common Objects
+    Error:
+      properties:
+        detail:
+          type: string
+          example: Name must be between 1 and 255 characters
+      required:
+        - detail
+
+    # Command Objects
+    AddExamResultDto:
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: 'Sam Lloyd'
+          description: Must be between 1 and 255 characters
+          minLength: 1
+          maxLength: 255
+        score:
+          type: integer
+          example: 50
+          description: The exam score
+        dateTaken:
+          type: string
+          format: date
+          example: '2022-06-30'
+      required:
+        - name
+        - score
+        - dateTaken
+
+    # Domain Objects
+    ExamResult:
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: 'Sam Lloyd'
+        score:
+          type: integer
+          example: 50
+          description: The exam score
+        dateTaken:
+          type: string
+          format: date
+          example: '2022-06-30'
+      required:
+        - id
+        - name
+        - score
+        - dateTaken
+
+  responses:
+    400:
+      description: Request failed, client error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    500:
+      description: Request failed, server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

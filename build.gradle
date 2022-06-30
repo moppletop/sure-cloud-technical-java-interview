@@ -1,0 +1,54 @@
+plugins {
+	id 'org.springframework.boot' version '2.6.7'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+	id "org.openapi.generator" version "6.0.0"
+	id "io.freefair.lombok" version "6.5.0.2"
+}
+
+group = 'com.surecloud'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'com.h2database:h2'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.openapitools:jackson-databind-nullable:0.2.2'
+	implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+openApiGenerate {
+	generatorName = "spring"
+	inputSpec = "$rootDir/exam-api.yaml".toString()
+	outputDir = "$buildDir/generated".toString()
+	ignoreFileOverride = ".openapi-generator-ignore"
+	apiPackage = "com.surecloud.javatechnicalinterview.api"
+	invokerPackage = "com.surecloud.javatechnicalinterview.invoker"
+	modelPackage = "com.surecloud.javatechnicalinterview.model"
+	generateApiTests = false
+	generateModelTests = false
+	configOptions = [
+			dateLibrary: "java8",
+			library: "spring-boot",
+			configPackage: "com.surecloud.javatechnicalinterview.config",
+			implicitHeaders: "true",
+			useOptional: "true",
+			singleContentTypes: "true",
+			delegatePattern: "true",
+			useTags: "true",
+			performBeanValidation: "false",
+			useBeanValidation: "false"
+	]
+}
+
+sourceSets.main.java.srcDirs += 'build/generated/src/main/java'
